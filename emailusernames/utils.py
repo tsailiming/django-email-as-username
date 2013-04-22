@@ -4,8 +4,15 @@ import os
 import re
 import sys
 
-from django.contrib.auth.models import User
 from django.db import IntegrityError
+
+try:
+    from django.contrib.auth import get_user_model
+except ImportError: # django < 1.5
+    from django.contrib.auth.models import User
+else:
+    User = get_user_model()
+
 
 
 # We need to convert emails to hashed versions when we store them in the

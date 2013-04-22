@@ -1,7 +1,13 @@
 from django.contrib.admin.sites import AdminSite
-from django.contrib.auth.models import User
 from emailusernames.forms import EmailAdminAuthenticationForm
 from emailusernames.utils import _email_to_username
+
+try:
+    from django.contrib.auth import get_user_model
+except ImportError: # django < 1.5
+    from django.contrib.auth.models import User
+else:
+    User = get_user_model()
 
 
 # Horrible monkey patching.

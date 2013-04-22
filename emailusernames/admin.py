@@ -2,11 +2,9 @@
 Override the add- and change-form in the admin, to hide the username.
 """
 from django.contrib.auth.admin import UserAdmin
-from django.contrib.auth.models import User
 from django.contrib import admin
 from emailusernames.forms import EmailUserCreationForm, EmailUserChangeForm
 from django.utils.translation import ugettext_lazy as _
-
 
 class EmailUserAdmin(UserAdmin):
     add_form = EmailUserCreationForm
@@ -29,9 +27,18 @@ class EmailUserAdmin(UserAdmin):
     ordering = ('email',)
 
 
-admin.site.unregister(User)
-admin.site.register(User, EmailUserAdmin)
+try:
+    from django.contrib.auth import get_user_model
+except ImportError: # django < 1.5
+    from django.contrib.auth.models import User
+else:
+    User = get_user_model()
 
+try:
+    admin.site.unregister(get_user_model())
+except: pass # AUTH_MODEL will not be registered
+
+admin.site.register(User, EmailUserAdmin)
 
 def __email_unicode__(self):
     return self.email

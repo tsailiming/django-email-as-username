@@ -2,9 +2,15 @@ from django import forms
 from django.contrib.auth import authenticate
 from django.contrib.auth.forms import UserCreationForm, UserChangeForm, AuthenticationForm
 from django.contrib.admin.forms import AdminAuthenticationForm
-from django.contrib.auth.models import User
 from django.utils.translation import ugettext_lazy as _
 from emailusernames.utils import user_exists
+
+try:
+    from django.contrib.auth import get_user_model
+except ImportError: # django < 1.5
+    from django.contrib.auth.models import User
+else:
+    User = get_user_model()
 
 
 ERROR_MESSAGE = _("Please enter a correct email and password. ")
