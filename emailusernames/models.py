@@ -2,6 +2,8 @@ from django.contrib.admin.sites import AdminSite
 from emailusernames.forms import EmailAdminAuthenticationForm
 from emailusernames.utils import _email_to_username
 
+from django.core.exceptions import ObjectDoesNotExist
+
 try:
     from django.contrib.auth import get_user_model
 except ImportError: # django < 1.5
@@ -26,7 +28,10 @@ def user_init_patch(self, *args, **kwargs):
 def user_save_patch(self, *args, **kwargs):
     email_as_username = (self.username.lower() == self.email.lower())
     if self.pk is not None:
-        old_user = self.__class__.objects.get(pk=self.pk)
+        try:
+            old_user = self.__class__.objects.get(pk=self.pk)
+        except ObjectDoesNotExist: pass
+
         email_as_username = (
             email_as_username or
             ('@' in self.username and old_user.username == old_user.email)
